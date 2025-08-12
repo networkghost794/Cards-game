@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Single Hint Card Drawer</title>
+<style>
+  body {
+    background: #121212;
+    color: #0f0;
+    font-family: monospace, monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    user-select: none;
+  }
+  #inputArea {
+    max-width: 400px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  textarea {
+    width: 100%;
+    height: 150px;
+    background: #222;
+    border: 2px solid #0f0;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 10px;
+    resize: vertical;
+  }
+  button {
+    background: #0f0;
+    color: #121212;
+    border: none;
+    padding: 12px 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  button:hover {
+    background: #0a0;
+  }
+
+  #cardContainer {
+    perspective: 1000px;
+  }
+  #card {
+    width: 320px;
+    height: 200px;
+    background: linear-gradient(145deg, #003300, #006600);
+    border-radius: 20px;
+    border: 3px solid #0f0;
+    box-shadow:
+      0 0 20px #0f0,
+      inset 0 0 15px #0a0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #afa;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s, box-shadow 0.3s;
+    margin-bottom: 20px;
+  }
+  #card:hover {
+    background: linear-gradient(145deg, #005500, #009900);
+    box-shadow:
+      0 0 40px #0f0,
+      inset 0 0 25px #0a0;
+  }
+  #hintCounter {
+    color: #0a0;
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+</style>
+</head>
+<body>
+
+<div id="inputArea">
+  <h2>Enter your hints (one per line):</h2>
+  <textarea id="hintsInput" placeholder="Example hint 1&#10;Example hint 2&#10;Another hint..."></textarea><br />
+  <button id="startBtn">Start Drawing</button>
+</div>
+
+<div id="gameArea" style="display:none; flex-direction: column; align-items: center;">
+  <div id="cardContainer">
+    <div id="card">Click to draw a hint</div>
+  </div>
+  <div id="hintCounter"></div>
+  <button id="resetBtn">Reset</button>
+</div>
+
+<script>
+  const hintsInput = document.getElementById('hintsInput');
+  const startBtn = document.getElementById('startBtn');
+  const inputArea = document.getElementById('inputArea');
+  const gameArea = document.getElementById('gameArea');
+  const card = document.getElementById('card');
+  const hintCounter = document.getElementById('hintCounter');
+  const resetBtn = document.getElementById('resetBtn');
+
+  let hints = [];
+  let availableHints = [];
+
+  startBtn.onclick = () => {
+    hints = hintsInput.value.split('\n').map(h => h.trim()).filter(h => h.length > 0);
+    if (hints.length === 0) {
+      alert('Please enter at least one hint.');
+      return;
+    }
+    availableHints = [...hints];
+    inputArea.style.display = 'none';
+    gameArea.style.display = 'flex';
+    card.textContent = 'Click to draw a hint';
+    updateCounter();
+  };
+
+  card.onclick = () => {
+    if (availableHints.length === 0) {
+      card.textContent = 'No hints left! Please reset.';
+      return;
+    }
+    const idx = Math.floor(Math.random() * availableHints.length);
+    const hint = availableHints.splice(idx, 1)[0];
+    card.textContent = hint;
+    updateCounter();
+  };
+
+  resetBtn.onclick = () => {
+    inputArea.style.display = 'block';
+    gameArea.style.display = 'none';
+    hintsInput.value = '';
+    hints = [];
+    availableHints = [];
+  };
+
+  function updateCounter() {
+    const drawn = hints.length - availableHints.length;
+    hintCounter.textContent = `Hints drawn: ${drawn} / ${hints.length}`;
+  }
+</script>
+
+</body>
+</html>
